@@ -1,0 +1,43 @@
+drop procedure IF EXISTS u_head_and_low_pro;
+
+delimiter //
+create procedure u_head_and_low_pro()
+begin
+  DECLARE n int DEFAULT 1;
+    WHILE n < 10 DO
+UPDATE his_deliver_a hd set hd.fund_account = convert(hd.fund_account, SIGNED) + n ;
+UPDATE his_deliver_a hd set hd.fund_account = convert(hd.fund_account, SIGNED) + n + 1000000 ;
+INSERT into his_deliver_b SELECT * from his_deliver_a; 
+set n = n + 1;
+  END WHILE;
+end
+//
+
+CALL u_head_and_low_pro();
+
+
+
+===============
+-- DELETE from his_deliver_20170901;
+-- DELETE from combusinacct ;
+SELECT * from his_deliver ;
+drop table  if exists his_deliver_a;
+create table his_deliver_a LIKE his_deliver ;
+drop table  if exists his_deliver_b;
+create table his_deliver_b LIKE his_deliver ;
+INSERT into his_deliver_a SELECT * from his_deliver; 
+-- UPDATE his_deliver_20170901 hd set hd.fund_account = convert(convert(hd.fund_account, SIGNED) + 10000000, varchar) ;
+
+delimiter $$
+drop procedure  if exists wk;
+create procedure wk()
+begin 
+declare i int ;　　　　　　　　　　
+set i = 1;
+while i < 10 do
+UPDATE his_deliver_a hd set hd.fund_account = convert(hd.fund_account, SIGNED) + i ;
+INSERT into his_deliver_b SELECT * from his_deliver_a; 
+set i = i + 1;
+end while;
+end $$
+call wk();
